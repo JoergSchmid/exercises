@@ -1,4 +1,4 @@
-package de.exercises.unitconverter.units;
+package de.exercises.unitconverter.lengths;
 
 public abstract class LengthUnit {
     public String name;

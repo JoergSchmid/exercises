@@ -1,7 +1,7 @@
 package de.exercises.unitconverter;
 
-import de.exercises.unitconverter.units.LengthUnit;
-import de.exercises.unitconverter.units.LengthUnitFactory;
+import de.exercises.unitconverter.lengths.LengthUnit;
+import de.exercises.unitconverter.lengths.LengthUnitFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import java.io.FileReader;
@@ -9,17 +9,17 @@ import java.io.FileWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-public class JSONLength {
+public class JSONLengthConverter {
     private String fromUnitName;
     private double fromValue;
     private String toUnitName;
     private double toValue;
 
     public static void main(String[] args) {
-        new JSONLength();
+        new JSONLengthConverter();
     }
 
-    public JSONLength() {
+    public JSONLengthConverter() {
         JSONParser parser = new JSONParser();
 
         try {

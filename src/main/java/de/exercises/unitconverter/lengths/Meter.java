@@ -1,4 +1,4 @@
-package de.exercises.unitconverter.units;
+package de.exercises.unitconverter.lengths;
 
 public class Meter extends LengthUnit {
     public static final String name = "meter";

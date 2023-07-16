@@ -1,4 +1,4 @@
-package de.exercises.unitconverter.units;
+package de.exercises.unitconverter.lengths;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;

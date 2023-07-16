@@ -1,4 +1,4 @@
-package de.exercises.unitconverter.units;
+package de.exercises.unitconverter.lengths;
 
 public class Foot extends LengthUnit {
     public static final String name = "foot";
