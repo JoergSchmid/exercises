@@ -36,3 +36,4 @@ bin/
 # Generated files
 /out/
 /unitConversionIO/*.json
+/target/
