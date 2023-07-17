@@ -14,7 +14,7 @@ public class JSONLengthConverterTest {
         writer.close();
     }
 
-    private JSONObject readfromOutputFile() throws IOException, ParseException {
+    private JSONObject readFromOutputFile() throws IOException, ParseException {
         Reader reader = new FileReader("C:\\gitroot\\Exercises\\unitConversionIO\\result.json");
         return (JSONObject) new JSONParser().parse(reader);
     }
@@ -30,7 +30,7 @@ public class JSONLengthConverterTest {
         new JSONLengthConverter();
 
         // Round the result
-        double result = Math.round((double) readfromOutputFile().get("foot"));
+        double result = Math.round((double) readFromOutputFile().get("foot"));
 
         assert result == 3.0;
 
@@ -42,7 +42,7 @@ public class JSONLengthConverterTest {
 
         new JSONLengthConverter();
 
-        result = Math.round((double) readfromOutputFile().get("foot"));
+        result = Math.round((double) readFromOutputFile().get("foot"));
 
         assert result == -330.0;
     }
