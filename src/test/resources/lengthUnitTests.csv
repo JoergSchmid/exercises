@@ -1,0 +1,3 @@
+fromUnit,toUnit,value,expected
+meter,foot,1,3
+foot, meter,1,0
