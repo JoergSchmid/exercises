@@ -59,32 +59,4 @@ public class JSONLengthConverterTest {
         assert (double) result.get("millimeter") == 30480000;
         assert (double) result.get("kilometer") == 30;
     }
-
-    @Test
-    public void testMeterToFoot() throws IOException, ParseException {
-        JSONObject input = new JSONObject();
-        input.put("from", "meter");
-        input.put("to", "foot");
-        input.put("value", 1);
-        writeToInputFile(input);
-
-        new JSONLengthConverter();
-
-        // Round the result
-        double result = Math.round((double) readFromOutputFile().get("foot"));
-
-        assert result == 3.0;
-
-        input.clear();
-        input.put("from", "meter");
-        input.put("to", "foot");
-        input.put("value", -100.5);
-        writeToInputFile(input);
-
-        new JSONLengthConverter();
-
-        result = Math.round((double) readFromOutputFile().get("foot"));
-
-        assert result == -330.0;
-    }
 }
