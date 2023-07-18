@@ -6,7 +6,6 @@ import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.*;
 
@@ -23,7 +22,7 @@ public class JSONLengthConverterTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/lengthUnitTests.csv", numLinesToSkip = 1)
+    @CsvFileSource(resources = "/lengthUnitSingleConversionTests.csv", numLinesToSkip = 2)
     public void testSingleConversions(String fromUnit, String toUnit, double value, double expected) throws IOException, ParseException {
         JSONObject input = new JSONObject();
         input.put("from", fromUnit);
