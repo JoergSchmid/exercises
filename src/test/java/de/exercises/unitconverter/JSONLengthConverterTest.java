@@ -59,5 +59,30 @@ public class JSONLengthConverterTest {
         assertEquals(30480000, (double) result.get("millimeter"));
         assertEquals(30, (double) result.get("kilometer"));
     }
+
+    @Test
+    public void testIncompleteInput() throws IOException, ParseException {
+        JSONObject input = new JSONObject();
+        writeToInputFile(input);
+
+        new JSONLengthConverter();
+
+        JSONObject result = readFromOutputFile();
+        assertTrue(result.containsKey("error"));
+
+        input.put("from", "meter");
+
+        new JSONLengthConverter();
+
+        result = readFromOutputFile();
+        assertTrue(result.containsKey("error"));
+
+        input.clear();
+        input.put("value", 1);
+
+        new JSONLengthConverter();
+
+        result = readFromOutputFile();
+        assertTrue(result.containsKey("error"));
     }
 }
