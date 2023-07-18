@@ -41,6 +41,26 @@ public class JSONLengthConverterTest {
     }
 
     @Test
+    public void testCompleteConversions() throws IOException, ParseException {
+        JSONObject input = new JSONObject();
+        input.put("from", "foot");
+        input.put("value", 100000);
+        writeToInputFile(input);
+
+        new JSONLengthConverter();
+
+        JSONObject result = readFromOutputFile();
+
+        assert result.size() == 7; // 6 units + "from"
+        assert (double) result.get("foot") == 100000;
+        assert (double) result.get("inch") == 1200000;
+        assert (double) result.get("mile") == 19;
+        assert (double) result.get("meter") == 30480;
+        assert (double) result.get("millimeter") == 30480000;
+        assert (double) result.get("kilometer") == 30;
+    }
+
+    @Test
     public void testMeterToFoot() throws IOException, ParseException {
         JSONObject input = new JSONObject();
         input.put("from", "meter");
