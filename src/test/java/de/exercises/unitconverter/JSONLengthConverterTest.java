@@ -4,9 +4,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-
 import java.io.*;
 
 public class JSONLengthConverterTest {
@@ -36,8 +36,8 @@ public class JSONLengthConverterTest {
         JSONObject output = readFromOutputFile();
         double result = Math.round((double) output.get(toUnit));
 
-        assert output.size() <= 2; // Only "from" and "to", except when they are identical
-        assert result == expected;
+        assertTrue(output.size() <= 2); // Only "from" and "to", except when they are identical
+        assertEquals(result, expected);
     }
 
     @Test
@@ -51,12 +51,13 @@ public class JSONLengthConverterTest {
 
         JSONObject result = readFromOutputFile();
 
-        assert result.size() == 7; // 6 units + "from"
-        assert (double) result.get("foot") == 100000;
-        assert (double) result.get("inch") == 1200000;
-        assert (double) result.get("mile") == 19;
-        assert (double) result.get("meter") == 30480;
-        assert (double) result.get("millimeter") == 30480000;
-        assert (double) result.get("kilometer") == 30;
+        assertEquals(7, result.size()); // 6 units + "from"
+        assertEquals(100000, (double) result.get("foot"));
+        assertEquals(1200000, (double) result.get("inch"));
+        assertEquals(19, (double) result.get("mile"));
+        assertEquals(30480, (double) result.get("meter"));
+        assertEquals(30480000, (double) result.get("millimeter"));
+        assertEquals(30, (double) result.get("kilometer"));
+    }
     }
 }
