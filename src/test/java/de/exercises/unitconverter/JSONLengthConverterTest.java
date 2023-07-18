@@ -36,7 +36,7 @@ public class JSONLengthConverterTest {
         JSONObject output = readFromOutputFile();
         double result = Math.round((double) output.get(toUnit));
 
-        assert output.size() == 2;
+        assert output.size() <= 2; // Only "from" and "to", except when they are identical
         assert result == expected;
     }
 
