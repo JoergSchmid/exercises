@@ -8,7 +8,11 @@ public class LengthUnitFactory {
     // Add new Units here
     public static Map<String, Class<? extends LengthUnit>> lengthUnitMapping = Map.of(
             Meter.name, Meter.class,
-            Foot.name, Foot.class
+            Kilometer.name, Kilometer.class,
+            Millimeter.name, Millimeter.class,
+            Foot.name, Foot.class,
+            Inch.name, Inch.class,
+            Mile.name, Mile.class
     );
 
     public static LengthUnit getClass(String name) {
