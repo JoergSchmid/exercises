@@ -3,11 +3,8 @@ package de.exercises.unitconverter.lengths;
 public class Foot extends LengthUnit {
     public static final String name = "foot";
 
-    public double toMeter(double value) {
-        return value / 3.280839895;
-    }
-
-    public double fromMeter(double value) {
-        return value * 3.280839895;
+    @Override
+    public double getConversionFactorToMeter() {
+        return 0.3048;
     }
 }
