@@ -2,12 +2,12 @@ package de.exercises.unitconverter;
 
 import de.exercises.unitconverter.lengths.LengthUnit;
 import de.exercises.unitconverter.lengths.LengthUnitFactory;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import java.io.FileReader;
+import org.json.JSONObject;
 import java.io.FileWriter;
-import java.io.Reader;
 import java.io.Writer;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class JSONLengthConverter {
     private String fromUnitName;
@@ -20,18 +20,16 @@ public class JSONLengthConverter {
     }
 
     public JSONLengthConverter() {
-        JSONParser parser = new JSONParser();
-
         try {
             String baseURL = "C:\\gitroot\\Exercises\\unitConversionIO\\";
 
-            Reader reader = new FileReader(baseURL + "input.json");
-
-            JSONObject input = (JSONObject) parser.parse(reader);
+            JSONObject input = new JSONObject(new String(Files.readAllBytes(Paths.get(baseURL + "input.json"))));
             fromUnitName = (String) input.get("from");
             toUnitName = (String) input.get("to");
-            Object value = input.get("value"); // Value might be of type Long or Double. Convert to double.
-            fromValue = value instanceof Long ? ((Long) value).doubleValue() : (double) value;
+            Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
+            fromValue = number instanceof Integer ? ((Integer) number).doubleValue() :
+                    number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
+                            ((Double) number);
 
             calculate();
 
@@ -40,7 +38,7 @@ public class JSONLengthConverter {
             output.put(toUnitName, toValue);
 
             Writer writer = new FileWriter(baseURL + "result.json");
-            writer.write(output.toJSONString());
+            writer.write(output.toString());
             writer.close();
 
         } catch (Exception e) {
