@@ -8,17 +8,21 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class JSONLengthConverterTest {
+    private final Path inputPath = Path.of( "C:\\gitroot\\Exercises\\unitConversionIO\\input.json");
+    private final String outputURL = "C:\\gitroot\\Exercises\\unitConversionIO\\result.json";
+
     private void writeToInputFile(JSONObject input) throws IOException {
-        Writer writer = new FileWriter("C:\\gitroot\\Exercises\\unitConversionIO\\input.json");
+        Writer writer = new FileWriter(inputPath.toString());
         writer.write(input.toString());
         writer.close();
     }
 
     private JSONObject readFromOutputFile() throws IOException {
-        String inputFile = new String(Files.readAllBytes(Paths.get("C:\\gitroot\\Exercises\\unitConversionIO\\result.json")));
+        String inputFile = new String(Files.readAllBytes(Paths.get(outputURL)));
         return new JSONObject(inputFile);
     }
 
@@ -31,7 +35,7 @@ public class JSONLengthConverterTest {
         input.put("value", value);
         writeToInputFile(input);
 
-        new JSONLengthConverter();
+        JSONLengthConverter.convertFromFile(inputPath);
 
         // Round the result
         JSONObject output = readFromOutputFile();
@@ -53,7 +57,7 @@ public class JSONLengthConverterTest {
         input.put("value", 100000);
         writeToInputFile(input);
 
-        new JSONLengthConverter();
+        JSONLengthConverter.convertFromFile(inputPath);
 
         JSONObject result = readFromOutputFile();
 
@@ -71,14 +75,14 @@ public class JSONLengthConverterTest {
         JSONObject input = new JSONObject();
         writeToInputFile(input);
 
-        new JSONLengthConverter();
+        JSONLengthConverter.convertFromFile(inputPath);
 
         JSONObject result = readFromOutputFile();
         assertNotNull(result.get("error"));
 
         input.put("from", "meter");
 
-        new JSONLengthConverter();
+        JSONLengthConverter.convertFromFile(inputPath);
 
         result = readFromOutputFile();
         assertNotNull(result.get("error"));
@@ -86,7 +90,7 @@ public class JSONLengthConverterTest {
         input.clear();
         input.put("value", 1);
 
-        new JSONLengthConverter();
+        JSONLengthConverter.convertFromFile(inputPath);
 
         result = readFromOutputFile();
         assertNotNull(result.get("error"));

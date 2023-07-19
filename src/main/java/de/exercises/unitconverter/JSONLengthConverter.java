@@ -7,37 +7,31 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class JSONLengthConverter {
-    private String fromUnitName;
-    private double fromValue;
-    private String toUnitName;
-    private double toValue;
 
     public static void main(String[] args) {
-        new JSONLengthConverter();
+        convertFromFile(Path.of("C:\\gitroot\\Exercises\\unitConversionIO\\input.json"));
     }
 
-    public JSONLengthConverter() {
+    public static void convertFromFile(Path path) {
         try {
-            String baseURL = "C:\\gitroot\\Exercises\\unitConversionIO\\";
-
-            JSONObject input = new JSONObject(new String(Files.readAllBytes(Paths.get(baseURL + "input.json"))));
-            fromUnitName = (String) input.get("from");
-            toUnitName = (String) input.get("to");
+            JSONObject input = new JSONObject(new String(Files.readAllBytes(path)));
+            String fromUnitName = (String) input.get("from");
+            String toUnitName = (String) input.get("to");
             Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
-            fromValue = number instanceof Integer ? ((Integer) number).doubleValue() :
+            double fromValue = number instanceof Integer ? ((Integer) number).doubleValue() :
                     number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
                             ((Double) number);
 
-            calculate();
+            double toValue = calculate(fromUnitName, toUnitName, fromValue);
 
             JSONObject output = new JSONObject();
             output.put(fromUnitName, fromValue);
             output.put(toUnitName, toValue);
 
-            Writer writer = new FileWriter(baseURL + "result.json");
+            Writer writer = new FileWriter(path.getParent() + "\\result.json");
             writer.write(output.toString());
             writer.close();
 
@@ -46,13 +40,12 @@ public class JSONLengthConverter {
         }
     }
 
-    private void calculate() {
+    private static double calculate(String fromUnitName, String toUnitName, double value) {
         LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
         LengthUnit toUnit = LengthUnitFactory.getClass(toUnitName);
         if(fromUnit == null || toUnit == null) {
-            toValue = 0;
-            return;
+            return 0.0;
         }
-        toValue = toUnit.fromMeter(fromUnit.toMeter(fromValue));
+        return toUnit.fromMeter(fromUnit.toMeter(value));
     }
 }
