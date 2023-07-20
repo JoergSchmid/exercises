@@ -95,4 +95,21 @@ public class JSONLengthConverterTest {
         result = readFromOutputFile();
         assertNotNull(result.get("error"));
     }
+
+    @Test
+    public void testInputFileMissing() throws IOException {
+        File file = new File(inputPath.toUri());
+        if(file.exists())
+            if(!file.delete()) {
+                System.out.println("Error occurred while testing in testInputFileMissing()\n"
+                                    + "Could not delete file.");
+                return;
+            }
+
+        // Try to convert with file not present
+        JSONLengthConverter.convertFromFile(inputPath);
+
+        JSONObject result = readFromOutputFile();
+        assertNotNull(result.get("error"));
+    }
 }
