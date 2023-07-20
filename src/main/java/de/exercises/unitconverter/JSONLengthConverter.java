@@ -17,7 +17,8 @@ public class JSONLengthConverter {
 
     public static void convertFromFile(Path path) {
         try {
-            JSONObject input = new JSONObject(new String(Files.readAllBytes(path)));
+            String outputUrl = inputPath.getParent() + "\\result.json";
+            JSONObject input = readFromInputFile(inputPath.toString());
             String fromUnitName = (String) input.get("from");
             String toUnitName = (String) input.get("to");
             Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
@@ -31,9 +32,7 @@ public class JSONLengthConverter {
             output.put(fromUnitName, fromValue);
             output.put(toUnitName, toValue);
 
-            Writer writer = new FileWriter(path.getParent() + "\\result.json");
-            writer.write(output.toString());
-            writer.close();
+            writeToOutputFile(output, outputUrl);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,4 +47,15 @@ public class JSONLengthConverter {
         }
         return toUnit.fromMeter(fromUnit.toMeter(value));
     }
+
+    private static JSONObject readFromInputFile(String url) throws IOException {
+        return new JSONObject(new String(Files.readAllBytes(Paths.get(url))));
+    }
+
+    private static void writeToOutputFile(JSONObject output, String url) throws IOException {
+        Writer writer = new FileWriter(url);
+        writer.write(output.toString());
+        writer.close();
+    }
+
 }
