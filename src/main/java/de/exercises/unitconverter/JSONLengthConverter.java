@@ -4,10 +4,12 @@ import de.exercises.unitconverter.lengths.LengthUnit;
 import de.exercises.unitconverter.lengths.LengthUnitFactory;
 import org.json.JSONObject;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class JSONLengthConverter {
 
@@ -15,10 +17,14 @@ public class JSONLengthConverter {
         convertFromFile(Path.of("C:\\gitroot\\Exercises\\unitConversionIO\\input.json"));
     }
 
-    public static void convertFromFile(Path path) {
+    public static void convertFromFile(Path inputPath) {
         try {
             String outputUrl = inputPath.getParent() + "\\result.json";
             JSONObject input = readFromInputFile(inputPath.toString());
+            if(!input.has("from") || !input.has("value")) {
+                writeError("Key(s) missing. Use 'from' and 'value' keys.", outputUrl);
+                return;
+            }
             String fromUnitName = (String) input.get("from");
             String toUnitName = (String) input.get("to");
             Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
@@ -58,4 +64,9 @@ public class JSONLengthConverter {
         writer.close();
     }
 
+    private static void writeError(String errorMessage, String outputUrl) throws IOException {
+        JSONObject error = new JSONObject();
+        error.put("error", errorMessage);
+        writeToOutputFile(error, outputUrl);
+    }
 }
