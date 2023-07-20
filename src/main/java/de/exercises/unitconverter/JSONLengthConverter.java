@@ -38,7 +38,7 @@ public class JSONLengthConverter {
             if(input.has("to")) {
                 singleConversion(output, fromUnitName, (String) input.get("to"), fromValue);
             } else {
-                // completeConversion(output, fromUnitName, fromValue);
+                completeConversion(output, fromUnitName, fromValue);
             }
 
             writeToOutputFile(output, outputUrl);
@@ -59,6 +59,16 @@ public class JSONLengthConverter {
             return;
         output.put(fromUnitName, value);
         output.put(toUnitName, toUnit.fromMeter(fromUnit.toMeter(value)));
+    }
+
+    private static void completeConversion(JSONObject output, String fromUnitName, double value) {
+        for(String unit : LengthUnitFactory.lengthUnitMapping.keySet()) {
+            LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
+            LengthUnit toUnit = LengthUnitFactory.getClass(unit);
+            if(fromUnit == null || toUnit == null)
+                return;
+            output.put(unit, toUnit.fromMeter(fromUnit.toMeter(value)));
+        }
     }
 
     private static JSONObject readFromInputFile(String url) throws IOException {
