@@ -18,8 +18,8 @@ public class JSONLengthConverter {
     }
 
     public static void convertFromFile(Path inputPath) {
+        String outputUrl = inputPath.getParent() + "\\result.json";
         try {
-            String outputUrl = inputPath.getParent() + "\\result.json";
             JSONObject input = readFromInputFile(inputPath.toString());
             if(!input.has("from") || !input.has("value")) {
                 writeError("Key(s) missing. Use 'from' and 'value' keys.", outputUrl);
@@ -40,8 +40,12 @@ public class JSONLengthConverter {
 
             writeToOutputFile(output, outputUrl);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            try {
+                writeError(e.getMessage(), outputUrl);
+            } catch (Exception f) {
+                System.out.println("Error: Could not write file:\n" + f.getMessage());
+            }
         }
     }
 
