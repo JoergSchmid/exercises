@@ -21,22 +21,25 @@ public class JSONLengthConverter {
         String outputUrl = inputPath.getParent() + "\\result.json";
         try {
             JSONObject input = readFromInputFile(inputPath.toString());
+
             if(!input.has("from") || !input.has("value")) {
                 writeError("Key(s) missing. Use 'from' and 'value' keys.", outputUrl);
                 return;
             }
+
             String fromUnitName = (String) input.get("from");
-            String toUnitName = (String) input.get("to");
             Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
             double fromValue = number instanceof Integer ? ((Integer) number).doubleValue() :
                     number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
                             ((Double) number);
 
-            double toValue = calculate(fromUnitName, toUnitName, fromValue);
-
             JSONObject output = new JSONObject();
-            output.put(fromUnitName, fromValue);
-            output.put(toUnitName, toValue);
+
+            if(input.has("to")) {
+                singleConversion(output, fromUnitName, (String) input.get("to"), fromValue);
+            } else {
+                // completeConversion(output, fromUnitName, fromValue);
+            }
 
             writeToOutputFile(output, outputUrl);
 
@@ -49,13 +52,13 @@ public class JSONLengthConverter {
         }
     }
 
-    private static double calculate(String fromUnitName, String toUnitName, double value) {
+    private static void singleConversion(JSONObject output, String fromUnitName, String toUnitName, double value) {
         LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
         LengthUnit toUnit = LengthUnitFactory.getClass(toUnitName);
-        if(fromUnit == null || toUnit == null) {
-            return 0.0;
-        }
-        return toUnit.fromMeter(fromUnit.toMeter(value));
+        if(fromUnit == null || toUnit == null)
+            return;
+        output.put(fromUnitName, value);
+        output.put(toUnitName, toUnit.fromMeter(fromUnit.toMeter(value)));
     }
 
     private static JSONObject readFromInputFile(String url) throws IOException {
