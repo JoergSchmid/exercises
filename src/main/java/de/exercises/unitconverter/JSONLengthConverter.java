@@ -33,6 +33,12 @@ public class JSONLengthConverter {
                     number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
                             ((Double) number);
 
+            if(!LengthUnitFactory.lengthUnitMapping.containsKey(fromUnitName) ||
+                    (input.has("to") && !LengthUnitFactory.lengthUnitMapping.containsKey((String) input.get("to")))) {
+                writeError("Unit not found.", outputUrl);
+                return;
+            }
+
             JSONObject output = new JSONObject();
 
             if(input.has("to")) {
