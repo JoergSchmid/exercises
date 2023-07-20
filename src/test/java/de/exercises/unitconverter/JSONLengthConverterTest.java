@@ -114,4 +114,17 @@ public class JSONLengthConverterTest {
         JSONObject result = readFromOutputFile();
         assertTrue(result.has("error"));
     }
+
+    @Test
+    public void testInvalidUnitName() throws IOException {
+        JSONObject input = new JSONObject();
+        input.put("from", "invalid");
+        input.put("value", 1);
+        writeToInputFile(input);
+
+        JSONLengthConverter.convertFromFile(inputPath);
+
+        JSONObject result = readFromOutputFile();
+        assertTrue(result.has("error"));
+    }
 }
