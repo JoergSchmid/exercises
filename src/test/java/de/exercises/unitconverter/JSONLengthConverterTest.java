@@ -78,14 +78,14 @@ public class JSONLengthConverterTest {
         JSONLengthConverter.convertFromFile(inputPath);
 
         JSONObject result = readFromOutputFile();
-        assertNotNull(result.get("error"));
+        assertTrue(result.has("error"));
 
         input.put("from", "meter");
 
         JSONLengthConverter.convertFromFile(inputPath);
 
         result = readFromOutputFile();
-        assertNotNull(result.get("error"));
+        assertTrue(result.has("error"));
 
         input.clear();
         input.put("value", 1);
@@ -93,7 +93,7 @@ public class JSONLengthConverterTest {
         JSONLengthConverter.convertFromFile(inputPath);
 
         result = readFromOutputFile();
-        assertNotNull(result.get("error"));
+        assertTrue(result.has("error"));
     }
 
     @Test
@@ -110,6 +110,6 @@ public class JSONLengthConverterTest {
         JSONLengthConverter.convertFromFile(inputPath);
 
         JSONObject result = readFromOutputFile();
-        assertNotNull(result.get("error"));
+        assertTrue(result.has("error"));
     }
 }
