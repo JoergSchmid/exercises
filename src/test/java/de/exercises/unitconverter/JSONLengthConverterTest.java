@@ -1,6 +1,8 @@
 package de.exercises.unitconverter;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import de.exercises.unitconverter.lengths.LengthUnitFactory;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,7 +63,7 @@ public class JSONLengthConverterTest {
 
         JSONObject result = readFromOutputFile();
 
-        assertEquals(7, result.length()); // 6 units + "from"
+        assertEquals(LengthUnitFactory.lengthUnitMapping.size(), result.length());
         assertEquals(100000, (double) result.get("foot"));
         assertEquals(1200000, (double) result.get("inch"));
         assertEquals(19, (double) result.get("mile"));
