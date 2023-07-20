@@ -28,6 +28,12 @@ public class JSONLengthConverterTest {
         return new JSONObject(inputFile);
     }
 
+    private double getRoundedDoubleFromObject(Object number) {
+        return Math.round(number instanceof Integer ? ((Integer) number).doubleValue() :
+                number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
+                       ((Double) number));
+    }
+
     @ParameterizedTest
     @CsvFileSource(resources = "/lengthUnitSingleConversionTests.csv", numLinesToSkip = 2)
     public void testSingleConversions(String fromUnit, String toUnit, double value, double expected) throws IOException {
@@ -41,12 +47,7 @@ public class JSONLengthConverterTest {
 
         // Round the result
         JSONObject output = readFromOutputFile();
-        Object number = output.get(toUnit);
-        double result = Math.round(
-                number instanceof Integer ? ((Integer) number).doubleValue() :
-                        number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
-                                ((Double) number)
-                );
+        double result = getRoundedDoubleFromObject(output.get(toUnit));
 
         assertTrue(output.length() <= 2); // Only "from" and "to", except when they are identical
         assertEquals(result, expected);
@@ -64,12 +65,12 @@ public class JSONLengthConverterTest {
         JSONObject result = readFromOutputFile();
 
         assertEquals(LengthUnitFactory.lengthUnitMapping.size(), result.length());
-        assertEquals(100000, (double) result.get("foot"));
-        assertEquals(1200000, (double) result.get("inch"));
-        assertEquals(19, (double) result.get("mile"));
-        assertEquals(30480, (double) result.get("meter"));
-        assertEquals(30480000, (double) result.get("millimeter"));
-        assertEquals(30, (double) result.get("kilometer"));
+        assertEquals(100000, getRoundedDoubleFromObject(result.get("foot")));
+        assertEquals(1200000, getRoundedDoubleFromObject(result.get("inch")));
+        assertEquals(19, getRoundedDoubleFromObject(result.get("mile")));
+        assertEquals(30480, getRoundedDoubleFromObject(result.get("meter")));
+        assertEquals(30480000, getRoundedDoubleFromObject(result.get("millimeter")));
+        assertEquals(30, getRoundedDoubleFromObject(result.get("kilometer")));
     }
 
     @Test
