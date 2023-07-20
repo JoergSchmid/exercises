@@ -81,6 +81,7 @@ public class JSONLengthConverterTest {
         assertTrue(result.has("error"));
 
         input.put("from", "meter");
+        writeToInputFile(input);
 
         JSONLengthConverter.convertFromFile(inputPath);
 
@@ -89,6 +90,7 @@ public class JSONLengthConverterTest {
 
         input.clear();
         input.put("value", 1);
+        writeToInputFile(input);
 
         JSONLengthConverter.convertFromFile(inputPath);
 
