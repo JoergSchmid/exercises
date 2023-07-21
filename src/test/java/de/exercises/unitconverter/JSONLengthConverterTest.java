@@ -24,8 +24,8 @@ public class JSONLengthConverterTest {
     }
 
     private JSONObject readFromOutputFile() throws IOException {
-        String inputFile = new String(Files.readAllBytes(Paths.get(outputURL)));
-        return new JSONObject(inputFile);
+        String outputFile = new String(Files.readAllBytes(outputPath));
+        return new JSONObject(outputFile);
     }
 
     private double getRoundedDoubleFromObject(Object number) {
