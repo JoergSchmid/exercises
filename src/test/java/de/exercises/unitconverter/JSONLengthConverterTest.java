@@ -41,9 +41,14 @@ public class JSONLengthConverterTest {
     }
 
     private double getRoundedDoubleFromObject(Object number) {
-        return Math.round(number instanceof Integer ? ((Integer) number).doubleValue() :
-                number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
-                       ((Double) number));
+        double num;
+        if(number instanceof Integer)
+            num = ((Integer) number).doubleValue();
+        else if(number instanceof BigDecimal)
+            num = ((BigDecimal) number).doubleValue();
+        else
+            num = (Double) number;
+        return Math.round(num);
     }
 
     @ParameterizedTest
