@@ -12,50 +12,60 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class JSONLengthConverter {
+    private double fromValue;
+    private String fromUnit;
+    private String toUnit;
+    private Path inputPath;
+    private Path outputPath;
 
-    public static void main(String[] args) {
-        convertFromFile(Path.of("unitConversionIO\\input.json"));
+    public void main(String[] args) {
+        JSONLengthConverter converter = new JSONLengthConverter(Path.of("unitConversionIO\\input.json"));
+        convert();
     }
 
-    public static void convertFromFile(Path inputPath) {
-        String outputUrl = inputPath.getParent() + "\\result.json";
+    public JSONLengthConverter(Path inputPath) {
+        this.inputPath = inputPath;
+        outputPath = Path.of(inputPath.getParent() + "\\result.json");
+    }
+
+    public void convert() {
         try {
-            JSONObject input = readFromInputFile(inputPath.toString());
+            JSONObject input = readFromInputFile(inputPath);
 
             if(!input.has("from") || !input.has("value")) {
-                writeError("Key(s) missing. Use 'from' and 'value' keys.", outputUrl);
+                writeError("Key(s) missing. Use 'from' and 'value' keys.", outputPath);
                 return;
             }
 
-            String fromUnitName = (String) input.get("from");
-            double fromValue = getDoubleFromObject(input.get("value"));
+            fromUnit = (String) input.get("from");
+            fromValue = getDoubleFromObject(input.get("value"));
 
-            if(!LengthUnitFactory.lengthUnitMapping.containsKey(fromUnitName) ||
+            if(!LengthUnitFactory.lengthUnitMapping.containsKey(fromUnit) ||
                     (input.has("to") && !LengthUnitFactory.lengthUnitMapping.containsKey((String) input.get("to")))) {
-                writeError("Unit not found.", outputUrl);
+                writeError("Unit not found.", outputPath);
                 return;
             }
 
             JSONObject output = new JSONObject();
 
             if(input.has("to")) {
-                singleConversion(output, fromUnitName, (String) input.get("to"), fromValue);
+                singleConversion(output, fromUnit, (String) input.get("to"), fromValue);
             } else {
-                completeConversion(output, fromUnitName, fromValue);
+                completeConversion(output, fromUnit, fromValue);
             }
 
-            writeToOutputFile(output, outputUrl);
+            writeToOutputFile(output, outputPath);
 
         } catch (IOException e) {
             try {
-                writeError(e.getMessage(), outputUrl);
+                writeError(e.getMessage(), outputPath);
             } catch (Exception f) {
                 System.out.println("Error: Could not write file:\n" + f.getMessage());
             }
         }
     }
 
-    private static void singleConversion(JSONObject output, String fromUnitName, String toUnitName, double value) {
+    private void singleConversion(JSONObject output, String fromUnitName, String toUnitName, double value) {
         LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
         LengthUnit toUnit = LengthUnitFactory.getClass(toUnitName);
         if(fromUnit == null || toUnit == null)
@@ -64,7 +74,7 @@ public class JSONLengthConverter {
         output.put(toUnitName, toUnit.fromMeter(fromUnit.toMeter(value)));
     }
 
-    private static void completeConversion(JSONObject output, String fromUnitName, double value) {
+    private void completeConversion(JSONObject output, String fromUnitName, double value) {
         for(String unit : LengthUnitFactory.lengthUnitMapping.keySet()) {
             LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
             LengthUnit toUnit = LengthUnitFactory.getClass(unit);
@@ -74,7 +84,7 @@ public class JSONLengthConverter {
         }
     }
 
-    private static double getDoubleFromObject(Object number) {
+    private double getDoubleFromObject(Object number) {
         if(number instanceof Integer)
             return ((Integer) number).doubleValue();
         if(number instanceof BigDecimal)
@@ -82,19 +92,19 @@ public class JSONLengthConverter {
         return (Double) number;
     }
 
-    private static JSONObject readFromInputFile(String url) throws IOException {
-        return new JSONObject(new String(Files.readAllBytes(Paths.get(url))));
+    private JSONObject readFromInputFile(Path path) throws IOException {
+        return new JSONObject(new String(Files.readAllBytes(path)));
     }
 
-    private static void writeToOutputFile(JSONObject output, String url) throws IOException {
-        Writer writer = new FileWriter(url);
+    private void writeToOutputFile(JSONObject output, Path path) throws IOException {
+        Writer writer = new FileWriter(path.toString());
         writer.write(output.toString());
         writer.close();
     }
 
-    private static void writeError(String errorMessage, String outputUrl) throws IOException {
+    private void writeError(String errorMessage, Path path) throws IOException {
         JSONObject error = new JSONObject();
         error.put("error", errorMessage);
-        writeToOutputFile(error, outputUrl);
+        writeToOutputFile(error, path);
     }
 }

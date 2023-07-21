@@ -18,6 +18,7 @@ import java.nio.file.Path;
 public class JSONLengthConverterTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private JSONLengthConverter jsonLengthConverter;
     private Path inputPath;
     private Path outputPath;
 
@@ -27,6 +28,7 @@ public class JSONLengthConverterTest {
         temporaryFolder.newFolder("conversion_test");
         inputPath = Path.of(temporaryFolder.getRoot().toPath() + "\\input.json");
         outputPath = Path.of(temporaryFolder.getRoot().toPath() + "\\result.json");
+        jsonLengthConverter = new JSONLengthConverter(inputPath);
     }
 
     private void writeToInputFile(JSONObject input) throws IOException {
@@ -60,7 +62,7 @@ public class JSONLengthConverterTest {
         input.put("value", value);
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         // Round the result
         JSONObject output = readFromOutputFile();
@@ -77,7 +79,7 @@ public class JSONLengthConverterTest {
         input.put("value", 100000);
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         JSONObject result = readFromOutputFile();
 
@@ -95,7 +97,7 @@ public class JSONLengthConverterTest {
         JSONObject input = new JSONObject();
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         JSONObject result = readFromOutputFile();
         assertTrue(result.has("error"));
@@ -103,7 +105,7 @@ public class JSONLengthConverterTest {
         input.put("from", "meter");
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         result = readFromOutputFile();
         assertTrue(result.has("error"));
@@ -112,7 +114,7 @@ public class JSONLengthConverterTest {
         input.put("value", 1);
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         result = readFromOutputFile();
         assertTrue(result.has("error"));
@@ -129,7 +131,7 @@ public class JSONLengthConverterTest {
             }
 
         // Try to convert with file not present
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         JSONObject result = readFromOutputFile();
         assertTrue(result.has("error"));
@@ -142,7 +144,7 @@ public class JSONLengthConverterTest {
         input.put("value", 1);
         writeToInputFile(input);
 
-        JSONLengthConverter.convertFromFile(inputPath);
+        jsonLengthConverter.convert();
 
         JSONObject result = readFromOutputFile();
         assertTrue(result.has("error"));
