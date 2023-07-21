@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class JSONLengthConverter {
 
     public static void main(String[] args) {
-        convertFromFile(Path.of("C:\\gitroot\\Exercises\\unitConversionIO\\input.json"));
+        convertFromFile(Path.of("unitConversionIO\\input.json"));
     }
 
     public static void convertFromFile(Path inputPath) {
