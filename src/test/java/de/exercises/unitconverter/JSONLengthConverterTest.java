@@ -4,18 +4,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.exercises.unitconverter.lengths.LengthUnitFactory;
 import org.json.JSONObject;
+import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.rules.TemporaryFolder;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class JSONLengthConverterTest {
-    private final Path inputPath = Path.of( "C:\\gitroot\\Exercises\\unitConversionIO\\input.json");
-    private final String outputURL = "C:\\gitroot\\Exercises\\unitConversionIO\\result.json";
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private Path inputPath;
+    private Path outputPath;
+
+    @BeforeEach
+    public void createTestFolder() throws IOException {
+        temporaryFolder.create();
+        temporaryFolder.newFolder("conversion_test");
+        inputPath = Path.of(temporaryFolder.getRoot().toPath() + "\\input.json");
+        outputPath = Path.of(temporaryFolder.getRoot().toPath() + "\\result.json");
+    }
 
     private void writeToInputFile(JSONObject input) throws IOException {
         Writer writer = new FileWriter(inputPath.toString());
