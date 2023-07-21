@@ -28,10 +28,7 @@ public class JSONLengthConverter {
             }
 
             String fromUnitName = (String) input.get("from");
-            Object number = input.get("value"); // Value might be of type Long or Double. Convert to double.
-            double fromValue = number instanceof Integer ? ((Integer) number).doubleValue() :
-                    number instanceof BigDecimal ? ((BigDecimal) number).doubleValue() :
-                            ((Double) number);
+            double fromValue = getDoubleFromObject(input.get("value"));
 
             if(!LengthUnitFactory.lengthUnitMapping.containsKey(fromUnitName) ||
                     (input.has("to") && !LengthUnitFactory.lengthUnitMapping.containsKey((String) input.get("to")))) {
@@ -75,6 +72,14 @@ public class JSONLengthConverter {
                 return;
             output.put(unit, toUnit.fromMeter(fromUnit.toMeter(value)));
         }
+    }
+
+    private static double getDoubleFromObject(Object number) {
+        if(number instanceof Integer)
+            return ((Integer) number).doubleValue();
+        if(number instanceof BigDecimal)
+            return ((BigDecimal) number).doubleValue();
+        return (Double) number;
     }
 
     private static JSONObject readFromInputFile(String url) throws IOException {
