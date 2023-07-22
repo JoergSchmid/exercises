@@ -9,79 +9,81 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class JSONLengthConverter {
-    private double fromValue;
+    private JSONObject input;
+    private Double fromValue;
     private String fromUnit;
     private String toUnit;
-    private Path inputPath;
-    private Path outputPath;
+    private final Path inputPath;
+    private final Path outputPath;
+    private String errorMessage;
+    private final JSONObject result;
 
-    public void main(String[] args) {
+    public static void main(String[] args) {
         JSONLengthConverter converter = new JSONLengthConverter(Path.of("unitConversionIO\\input.json"));
-        convert();
+        converter.convert();
     }
 
     public JSONLengthConverter(Path inputPath) {
         this.inputPath = inputPath;
         outputPath = Path.of(inputPath.getParent() + "\\result.json");
+        result = new JSONObject();
     }
 
     public void convert() {
         try {
-            JSONObject input = readFromInputFile(inputPath);
+            reset();
 
-            if(!input.has("from") || !input.has("value")) {
-                writeError("Key(s) missing. Use 'from' and 'value' keys.", outputPath);
-                return;
+            if(checkFileExists()) {
+                input = readFromInputFile(inputPath);
+
+                if(checkHasCorrectInputKeys()) {
+                    fromUnit = (String) input.get("from");
+                    fromValue = getDoubleFromObject(input.get("value"));
+                    toUnit = input.has("to") ? (String) input.get("to") : null;
+
+                    if(checkUnitsExist()) {
+                        if(toUnit != null) {
+                            singleConversion(toUnit);
+                        } else {
+                            completeConversion();
+                        }
+                        writeToOutputFile();
+                        return;
+                    }
+                }
             }
 
-            fromUnit = (String) input.get("from");
-            fromValue = getDoubleFromObject(input.get("value"));
+            writeErrorInResult();
+            writeToOutputFile();
 
-            if(!LengthUnitFactory.lengthUnitMapping.containsKey(fromUnit) ||
-                    (input.has("to") && !LengthUnitFactory.lengthUnitMapping.containsKey((String) input.get("to")))) {
-                writeError("Unit not found.", outputPath);
-                return;
-            }
-
-            JSONObject output = new JSONObject();
-
-            if(input.has("to")) {
-                singleConversion(output, fromUnit, (String) input.get("to"), fromValue);
-            } else {
-                completeConversion(output, fromUnit, fromValue);
-            }
-
-            writeToOutputFile(output, outputPath);
-
-        } catch (IOException e) {
-            try {
-                writeError(e.getMessage(), outputPath);
-            } catch (Exception f) {
-                System.out.println("Error: Could not write file:\n" + f.getMessage());
-            }
+        } catch (Exception e) {
+            System.out.println("Unexpected error occurred:\n" + e.getMessage());
         }
     }
 
-    private void singleConversion(JSONObject output, String fromUnitName, String toUnitName, double value) {
-        LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
-        LengthUnit toUnit = LengthUnitFactory.getClass(toUnitName);
-        if(fromUnit == null || toUnit == null)
+    private void reset() {
+        fromValue = null;
+        fromUnit = null;
+        toUnit = null;
+        errorMessage = null;
+        result.clear();
+
+    }
+
+    private void singleConversion(String unit) {
+        LengthUnit fromUnitClass = LengthUnitFactory.getClass(fromUnit);
+        LengthUnit toUnitClass = LengthUnitFactory.getClass(unit);
+        if(fromUnitClass == null || toUnitClass == null)
             return;
-        output.put(fromUnitName, value);
-        output.put(toUnitName, toUnit.fromMeter(fromUnit.toMeter(value)));
+        result.put(fromUnit, fromValue);
+        result.put(unit, toUnitClass.fromMeter(fromUnitClass.toMeter(fromValue)));
     }
 
-    private void completeConversion(JSONObject output, String fromUnitName, double value) {
-        for(String unit : LengthUnitFactory.lengthUnitMapping.keySet()) {
-            LengthUnit fromUnit = LengthUnitFactory.getClass(fromUnitName);
-            LengthUnit toUnit = LengthUnitFactory.getClass(unit);
-            if(fromUnit == null || toUnit == null)
-                return;
-            output.put(unit, toUnit.fromMeter(fromUnit.toMeter(value)));
-        }
+    private void completeConversion() {
+        for(String unit : LengthUnitFactory.lengthUnitMapping.keySet())
+            singleConversion(unit);
     }
 
     private double getDoubleFromObject(Object number) {
@@ -96,15 +98,39 @@ public class JSONLengthConverter {
         return new JSONObject(new String(Files.readAllBytes(path)));
     }
 
-    private void writeToOutputFile(JSONObject output, Path path) throws IOException {
-        Writer writer = new FileWriter(path.toString());
-        writer.write(output.toString());
+    private void writeToOutputFile() throws IOException {
+        Writer writer = new FileWriter(outputPath.toString());
+        writer.write(result.toString());
         writer.close();
     }
 
-    private void writeError(String errorMessage, Path path) throws IOException {
-        JSONObject error = new JSONObject();
-        error.put("error", errorMessage);
-        writeToOutputFile(error, path);
+    private boolean checkFileExists() {
+        if(Files.exists(inputPath))
+            return true;
+
+        errorMessage = "File not found.";
+        return false;
+    }
+
+    private boolean checkHasCorrectInputKeys() {
+        if(input.has("from") && input.has("value"))
+            return true;
+        errorMessage = "Key(s) missing. Use 'from' and 'value' keys.";
+        return false;
+    }
+
+    private boolean checkUnitsExist() {
+        if(LengthUnitFactory.lengthUnitMapping.containsKey(fromUnit) &&
+                (toUnit == null || LengthUnitFactory.lengthUnitMapping.containsKey(toUnit))) {
+            return true;
+        }
+        errorMessage = "Unit not found.";
+        return false;
+    }
+
+    private void writeErrorInResult() throws IOException {
+        result.clear();
+        result.put("error", errorMessage);
+        writeToOutputFile();
     }
 }
