@@ -11,7 +11,6 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 public class JSONLengthConverter {
     private final Path inputPath;
@@ -55,7 +54,7 @@ public class JSONLengthConverter {
         }
     }
 
-    private void convertJSONArray(JSONArray input) throws IOException {
+    private void convertJSONArray(JSONArray input) {
         JSONObject obj;
         for(int i = 0; i < input.length(); i++) {
             obj = input.getJSONObject(i);
@@ -71,11 +70,11 @@ public class JSONLengthConverter {
                     } else {
                         completeConversion(fromUnit, fromValue);
                     }
-                    output.put(new JSONObject(result.toString())); // JSONArray stores references to JSONObjects
+                    writeIntoOutputArray(result);
                     continue;
                 }
             }
-            writeError(obj, errorMessage);
+            writeIntoOutputArray(new JSONObject().put("error", errorMessage));
         }
     }
 
@@ -129,6 +128,10 @@ public class JSONLengthConverter {
         writer.close();
     }
 
+    private void writeIntoOutputArray(JSONObject object) {
+        output.put(new JSONObject(object.toString()));
+    }
+
     private boolean checkFileExists() {
         if(Files.exists(inputPath))
             return true;
@@ -151,10 +154,5 @@ public class JSONLengthConverter {
         }
         errorMessage = "Unit not found.";
         return false;
-    }
-
-    private void writeError(JSONObject object, String message) {
-        object.clear();
-        object.put("error", message);
     }
 }
