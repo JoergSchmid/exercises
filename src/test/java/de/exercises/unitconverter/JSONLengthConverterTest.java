@@ -3,6 +3,7 @@ package de.exercises.unitconverter;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.exercises.unitconverter.lengths.LengthUnitFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,9 +38,19 @@ public class JSONLengthConverterTest {
         writer.close();
     }
 
+    private void writeToInputFile(JSONArray input) throws IOException {
+        Writer writer = new FileWriter(inputPath.toString());
+        writer.write(input.toString());
+        writer.close();
+    }
+
     private JSONObject readFromOutputFile() throws IOException {
+        return readArrayFromOutputFile().getJSONObject(0);
+    }
+
+    private JSONArray readArrayFromOutputFile() throws IOException {
         String outputFile = new String(Files.readAllBytes(outputPath));
-        return new JSONObject(outputFile);
+        return new JSONArray(outputFile);
     }
 
     private double getRoundedDoubleFromObject(Object number) {
@@ -91,6 +102,28 @@ public class JSONLengthConverterTest {
         assertEquals(30480000, getRoundedDoubleFromObject(result.get("millimeter")));
         assertEquals(30, getRoundedDoubleFromObject(result.get("kilometer")));
     }
+    
+    @Test
+    public void testInputJsonArray() throws IOException {
+        JSONObject[] input = new JSONObject[2];
+        input[0].put("from", "foot");
+        input[0].put("value", 10);
+        input[1].put("from", "kilometer");
+        input[1].put("to", "inch");
+        input[1].put("value", -5.5);
+
+        JSONArray array = new JSONArray();
+        array.put(input);
+        writeToInputFile(array);
+
+        jsonLengthConverter.convert();
+
+        JSONArray result = readArrayFromOutputFile();
+
+        assertNotNull(result);
+        assertEquals(120, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
+        assertEquals(-216535, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
+    }
 
     @Test
     public void testIncompleteInput() throws IOException {
@@ -118,6 +151,37 @@ public class JSONLengthConverterTest {
 
         result = readFromOutputFile();
         assertTrue(result.has("error"));
+    }
+
+    @Test
+    public void testInputArrayWithOneFaultyInput() throws IOException {
+        JSONObject[] input = new JSONObject[3];
+
+        input[0].put("from", "meter");
+        input[0].put("value", 5);
+
+        // "value" is missing here
+        input[1].put("from", "millimeter");
+        input[1].put("to", "inch");
+
+        input[2].put("from", "kilometer");
+        input[2].put("to", "inch");
+        input[2].put("value", -10);
+
+        JSONArray array = new JSONArray();
+        array.put(input);
+        writeToInputFile(array);
+
+        jsonLengthConverter.convert();
+
+        JSONArray result = readArrayFromOutputFile();
+
+        assertNotNull(result);
+        // Correct inputs
+        assertEquals(5000, getRoundedDoubleFromObject(result.getJSONObject(0).get("millimeter")));
+        assertEquals(-393701, getRoundedDoubleFromObject(result.getJSONObject(2).get("inch")));
+        // Faulty input
+        assertTrue(result.getJSONObject(1).has("error"));
     }
 
     @Test
