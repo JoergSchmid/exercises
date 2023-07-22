@@ -14,9 +14,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 public class JSONLengthConverter {
-    private Double fromValue;
-    private String fromUnit;
-    private String toUnit;
     private final Path inputPath;
     private final Path outputPath;
     private String errorMessage;
@@ -48,28 +45,7 @@ public class JSONLengthConverter {
                 JSONArray input = readFromInputFile();
 
                 if(input != null) {
-                    JSONObject obj;
-                    for(int i = 0; i < input.length(); i++) {
-                        obj = input.getJSONObject(i);
-
-                        if(checkHasCorrectInputKeys(obj)) {
-                            fromUnit = (String) obj.get("from");
-                            fromValue = getDoubleFromObject(obj.get("value"));
-                            toUnit = obj.has("to") ? (String) obj.get("to") : null;
-
-                            if(checkUnitsExist()) {
-                                if(toUnit != null) {
-                                    singleConversion(toUnit);
-                                } else {
-                                    completeConversion();
-                                }
-                                output.put(result);
-                                writeToOutputFile();
-                                continue;
-                            }
-                        }
-                        writeError(obj, errorMessage);
-                    }
+                    convertJSONArray(input);
                 }
             }
 
@@ -79,27 +55,48 @@ public class JSONLengthConverter {
         }
     }
 
+    private void convertJSONArray(JSONArray input) throws IOException {
+        JSONObject obj;
+        for(int i = 0; i < input.length(); i++) {
+            obj = input.getJSONObject(i);
+
+            if(checkHasCorrectInputKeys(obj)) {
+                String fromUnit = (String) obj.get("from");
+                double fromValue = getDoubleFromObject(obj.get("value"));
+                String toUnit = obj.has("to") ? (String) obj.get("to") : null;
+
+                if(checkUnitsExist(fromUnit, toUnit)) {
+                    if(toUnit != null) {
+                        singleConversion(fromUnit, fromValue, toUnit);
+                    } else {
+                        completeConversion(fromUnit, fromValue);
+                    }
+                    output.put(new JSONObject(result.toString())); // JSONArray stores references to JSONObjects
+                    continue;
+                }
+            }
+            writeError(obj, errorMessage);
+        }
+    }
+
     private void reset() {
-        fromValue = null;
-        fromUnit = null;
-        toUnit = null;
         errorMessage = null;
         result.clear();
 
     }
 
-    private void singleConversion(String unit) {
+    private void singleConversion(String fromUnit, double value, String toUnit) {
         LengthUnit fromUnitClass = LengthUnitFactory.getClass(fromUnit);
-        LengthUnit toUnitClass = LengthUnitFactory.getClass(unit);
+        LengthUnit toUnitClass = LengthUnitFactory.getClass(toUnit);
         if(fromUnitClass == null || toUnitClass == null)
             return;
-        result.put(fromUnit, fromValue);
-        result.put(unit, toUnitClass.fromMeter(fromUnitClass.toMeter(fromValue)));
+        result.put(fromUnit, value);
+        result.put(toUnit, toUnitClass.fromMeter(fromUnitClass.toMeter(value)));
     }
 
-    private void completeConversion() {
+    private void completeConversion(String fromUnit, double value) {
         for(String unit : LengthUnitFactory.lengthUnitMapping.keySet())
-            singleConversion(unit);
+            singleConversion(fromUnit, value, unit);
     }
 
     private double getDoubleFromObject(Object number) {
@@ -147,7 +144,7 @@ public class JSONLengthConverter {
         return false;
     }
 
-    private boolean checkUnitsExist() {
+    private boolean checkUnitsExist(String fromUnit, String toUnit) {
         if(LengthUnitFactory.lengthUnitMapping.containsKey(fromUnit) &&
                 (toUnit == null || LengthUnitFactory.lengthUnitMapping.containsKey(toUnit))) {
             return true;
