@@ -45,9 +45,9 @@ public class JSONLengthConverter {
 
                 if(input != null) {
                     convertJSONArray(input);
-                }
-            }
-
+                } else writeErrorIntoOutputArray();
+            } else writeErrorIntoOutputArray();
+            
             writeToOutputFile();
         } catch (Exception e) {
             System.out.println("Unexpected error occurred:\n" + e.getMessage());
@@ -116,6 +116,7 @@ public class JSONLengthConverter {
             try {
                 arr = new JSONArray().put(new JSONObject(str));
             } catch (JSONException f) {
+                errorMessage = "No valid JSON found.";
                 return null;
             }
         }
@@ -130,6 +131,10 @@ public class JSONLengthConverter {
 
     private void writeIntoOutputArray(JSONObject object) {
         output.put(new JSONObject(object.toString()));
+    }
+
+    private void writeErrorIntoOutputArray() {
+        output.put(new JSONObject().put("error", errorMessage));
     }
 
     private boolean checkFileExists() {
