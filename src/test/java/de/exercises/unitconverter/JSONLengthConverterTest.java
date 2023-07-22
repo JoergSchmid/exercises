@@ -106,8 +106,10 @@ public class JSONLengthConverterTest {
     @Test
     public void testInputJsonArray() throws IOException {
         JSONObject[] input = new JSONObject[2];
+        input[0] = new JSONObject();
         input[0].put("from", "foot");
         input[0].put("value", 10);
+        input[1] = new JSONObject();
         input[1].put("from", "kilometer");
         input[1].put("to", "inch");
         input[1].put("value", -5.5);
@@ -157,13 +159,16 @@ public class JSONLengthConverterTest {
     public void testInputArrayWithOneFaultyInput() throws IOException {
         JSONObject[] input = new JSONObject[3];
 
+        input[0] = new JSONObject();
         input[0].put("from", "meter");
         input[0].put("value", 5);
 
         // "value" is missing here
+        input[1] = new JSONObject();
         input[1].put("from", "millimeter");
         input[1].put("to", "inch");
 
+        input[2] = new JSONObject();
         input[2].put("from", "kilometer");
         input[2].put("to", "inch");
         input[2].put("value", -10);
