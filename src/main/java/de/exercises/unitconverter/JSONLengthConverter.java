@@ -36,7 +36,7 @@ public class JSONLengthConverter {
             reset();
 
             if(checkFileExists()) {
-                input = readFromInputFile(inputPath);
+                input = readFromInputFile();
 
                 if(checkHasCorrectInputKeys()) {
                     fromUnit = (String) input.get("from");
@@ -94,8 +94,8 @@ public class JSONLengthConverter {
         return (Double) number;
     }
 
-    private JSONObject readFromInputFile(Path path) throws IOException {
-        return new JSONObject(new String(Files.readAllBytes(path)));
+    private JSONObject readFromInputFile() throws IOException {
+        return new JSONObject(new String(Files.readAllBytes(inputPath)));
     }
 
     private void writeToOutputFile() throws IOException {
