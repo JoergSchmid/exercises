@@ -125,6 +125,7 @@ public class JSONLengthConverterTest {
         assertNotNull(result);
         assertEquals(120, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
         assertEquals(-216535, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
+        assertEquals(-216535, getRoundedDoubleFromObject(result.getJSONObject(1).get("inch")));
     }
 
     @Test
