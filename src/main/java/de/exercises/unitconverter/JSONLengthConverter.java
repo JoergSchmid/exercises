@@ -21,7 +21,12 @@ public class JSONLengthConverter {
     private final JSONObject result;
 
     public static void main(String[] args) {
-        JSONLengthConverter converter = new JSONLengthConverter(Path.of("unitConversionIO\\input.json"));
+        Path path;
+        if(args.length == 0)
+            path = Path.of("unitConversionIO\\input.json");
+        else
+            path = Path.of(args[0]);
+        JSONLengthConverter converter = new JSONLengthConverter(path);
         converter.convert();
     }
 
