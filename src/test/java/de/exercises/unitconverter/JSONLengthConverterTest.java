@@ -15,6 +15,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class JSONLengthConverterTest {
     @Rule
@@ -38,9 +39,9 @@ public class JSONLengthConverterTest {
         writer.close();
     }
 
-    private void writeToInputFile(JSONArray input) throws IOException {
+    private void writeToInputFile(JSONObject[] input) throws IOException {
         Writer writer = new FileWriter(inputPath.toString());
-        writer.write(input.toString());
+        writer.write(Arrays.toString(input));
         writer.close();
     }
 
@@ -116,7 +117,7 @@ public class JSONLengthConverterTest {
 
         JSONArray array = new JSONArray();
         array.put(input);
-        writeToInputFile(array);
+        writeToInputFile(input);
 
         jsonLengthConverter.convert();
 
@@ -124,7 +125,6 @@ public class JSONLengthConverterTest {
 
         assertNotNull(result);
         assertEquals(120, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
-        assertEquals(-216535, getRoundedDoubleFromObject(result.getJSONObject(0).get("inch")));
         assertEquals(-216535, getRoundedDoubleFromObject(result.getJSONObject(1).get("inch")));
     }
 
@@ -174,9 +174,7 @@ public class JSONLengthConverterTest {
         input[2].put("to", "inch");
         input[2].put("value", -10);
 
-        JSONArray array = new JSONArray();
-        array.put(input);
-        writeToInputFile(array);
+        writeToInputFile(input);
 
         jsonLengthConverter.convert();
 
