@@ -54,10 +54,7 @@ public class JSONLengthConverter {
                     }
                 }
             }
-
-            writeErrorInResult();
-            writeToOutputFile();
-
+            writeError();
         } catch (Exception e) {
             System.out.println("Unexpected error occurred:\n" + e.getMessage());
         }
@@ -128,7 +125,7 @@ public class JSONLengthConverter {
         return false;
     }
 
-    private void writeErrorInResult() throws IOException {
+    private void writeError() throws IOException {
         result.clear();
         result.put("error", errorMessage);
         writeToOutputFile();
