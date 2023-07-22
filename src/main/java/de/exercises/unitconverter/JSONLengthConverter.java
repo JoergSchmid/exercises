@@ -2,6 +2,8 @@ package de.exercises.unitconverter;
 
 import de.exercises.unitconverter.lengths.LengthUnit;
 import de.exercises.unitconverter.lengths.LengthUnitFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,9 +11,9 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class JSONLengthConverter {
-    private JSONObject input;
     private Double fromValue;
     private String fromUnit;
     private String toUnit;
@@ -19,6 +21,7 @@ public class JSONLengthConverter {
     private final Path outputPath;
     private String errorMessage;
     private final JSONObject result;
+    private final JSONArray output;
 
     public static void main(String[] args) {
         Path path;
@@ -34,6 +37,7 @@ public class JSONLengthConverter {
         this.inputPath = inputPath;
         outputPath = Path.of(inputPath.getParent() + "\\result.json");
         result = new JSONObject();
+        output = new JSONArray();
     }
 
     public void convert() {
@@ -41,25 +45,35 @@ public class JSONLengthConverter {
             reset();
 
             if(checkFileExists()) {
-                input = readFromInputFile();
+                JSONArray input = readFromInputFile();
 
-                if(checkHasCorrectInputKeys()) {
-                    fromUnit = (String) input.get("from");
-                    fromValue = getDoubleFromObject(input.get("value"));
-                    toUnit = input.has("to") ? (String) input.get("to") : null;
+                if(input != null) {
+                    JSONObject obj;
+                    for(int i = 0; i < input.length(); i++) {
+                        obj = input.getJSONObject(i);
 
-                    if(checkUnitsExist()) {
-                        if(toUnit != null) {
-                            singleConversion(toUnit);
-                        } else {
-                            completeConversion();
+                        if(checkHasCorrectInputKeys(obj)) {
+                            fromUnit = (String) obj.get("from");
+                            fromValue = getDoubleFromObject(obj.get("value"));
+                            toUnit = obj.has("to") ? (String) obj.get("to") : null;
+
+                            if(checkUnitsExist()) {
+                                if(toUnit != null) {
+                                    singleConversion(toUnit);
+                                } else {
+                                    completeConversion();
+                                }
+                                output.put(result);
+                                writeToOutputFile();
+                                continue;
+                            }
                         }
-                        writeToOutputFile();
-                        return;
+                        writeError(obj, errorMessage);
                     }
                 }
             }
-            writeError();
+
+            writeToOutputFile();
         } catch (Exception e) {
             System.out.println("Unexpected error occurred:\n" + e.getMessage());
         }
@@ -96,13 +110,25 @@ public class JSONLengthConverter {
         return (Double) number;
     }
 
-    private JSONObject readFromInputFile() throws IOException {
-        return new JSONObject(new String(Files.readAllBytes(inputPath)));
+    private JSONArray readFromInputFile() throws IOException {
+        String str = new String(Files.readAllBytes(inputPath));
+        JSONArray arr;
+        // Create array from json array or -object
+        try {
+            arr = new JSONArray(str);
+        } catch (JSONException e) {
+            try {
+                arr = new JSONArray().put(new JSONObject(str));
+            } catch (JSONException f) {
+                return null;
+            }
+        }
+        return arr;
     }
 
     private void writeToOutputFile() throws IOException {
         Writer writer = new FileWriter(outputPath.toString());
-        writer.write(result.toString());
+        writer.write(output.toString());
         writer.close();
     }
 
@@ -114,8 +140,8 @@ public class JSONLengthConverter {
         return false;
     }
 
-    private boolean checkHasCorrectInputKeys() {
-        if(input.has("from") && input.has("value"))
+    private boolean checkHasCorrectInputKeys(JSONObject obj) {
+        if(obj.has("from") && obj.has("value"))
             return true;
         errorMessage = "Key(s) missing. Use 'from' and 'value' keys.";
         return false;
@@ -130,9 +156,8 @@ public class JSONLengthConverter {
         return false;
     }
 
-    private void writeError() throws IOException {
-        result.clear();
-        result.put("error", errorMessage);
-        writeToOutputFile();
+    private void writeError(JSONObject object, String message) {
+        object.clear();
+        object.put("error", message);
     }
 }
