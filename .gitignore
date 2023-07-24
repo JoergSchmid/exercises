@@ -30,3 +30,10 @@ bin/
 
 # Default ignored files
 /shelf/
+/.idea/workspace.xml
+
+
+# Generated files
+/out/
+/unitConversionIO/*.json
+/target/
