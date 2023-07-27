@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class PiThonAPITest {
     // Define the 3 available irrational numbers up to 20 digits (after ".")
-    private Map<String, String> nums = Map.of(
+    private final Map<String, String> nums = Map.of(
             "pi", "3.14159265358979323846",
             "e", "2.71828182845904523536",
             "sqrt2", "1.41421356237309504880"
