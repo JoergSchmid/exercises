@@ -10,7 +10,23 @@ public class PiThonAPI {
     public static final String PITHON_URL = "http://localhost:5000/api";
 
     public static void main(String[] args) {
-        System.out.println(getDigits(args[0], Integer.parseInt(args[1])));
+        if(args[0] == null) {
+            System.out.println("argument(s) missing: number (pi, e, sqrt2) and amount(optional)");
+            return;
+        }
+        String number = args[0];
+        int amount;
+        if(args[1] != null) {
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.out.println("Unable to read amount (second argument)");
+                return;
+            }
+        } else {
+            amount = 10;
+        }
+        System.out.println(getDigits(number, amount));
     }
 
     public static String getDigits(String number, int amount) {
@@ -31,7 +47,7 @@ public class PiThonAPI {
                 in.close();
                 return response;
             } else {
-                return "Error: received status code" + con.getResponseCode();
+                return "Error: received status code " + con.getResponseCode();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
