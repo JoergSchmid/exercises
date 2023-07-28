@@ -11,7 +11,7 @@ public class PiThonAPI {
 
     public static void main(String[] args) {
         if(args[0] == null) {
-            System.out.println("argument(s) missing: number (pi, e, sqrt2) and amount(optional)");
+            System.out.println("argument(s) missing: pi|e|sqrt2 [amount]");
             return;
         }
         String number = args[0];
