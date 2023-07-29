@@ -44,12 +44,22 @@ public class PiThonAPI {
                     }
                 })
                 .build();
+
+        // Request current progress
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(PITHON_URL + "?number=pi"))
+                .uri(URI.create(PITHON_URL + "?number=" + number))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
+
+        // Request next 10
+        request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(PITHON_URL + "?number=pi&amount=10"))
+                .build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("+ " + response.body());
     }
 
     public static String getDigits(String number, int amount) {
